@@ -1,15 +1,11 @@
-# Nodejs Programmeren 4 Express server
+# Nodejs Express Server
 
-Hier komt een korte introductie.
+Dit is mijn opgave voor de nodejs express server voor programmeren 4.
 
-## Installing
+## Beschrijving
 
-To install, run `npm install`.
+Deze server gebruikt express js als framework voor het maken van een API gebaseerd op de share-a-meal functioneel ontwerp. De API maakt gebruik van een database kopeling voor users en meals.
 
-## Running
+## Deployment
 
-To run the server in your local development environment, type `npm run dev`.
-
-## Run the tests
-
-To run the tests, type `npm test`.
+De server is gedeployed op Azure. Het domain kan gevonden via [LINK]
