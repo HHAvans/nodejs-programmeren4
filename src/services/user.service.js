@@ -95,6 +95,41 @@ const userService = {
                 }
             )
         })
+    },
+
+    getById: (userId, callback) => {
+        logger.info('getById userId:', userId)
+    
+        db.getConnection(function (err, connection) {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+    
+            connection.query(
+                'SELECT id, firstName, lastName FROM `user` WHERE id = ?',
+                [userId],
+                function (error, results, fields) {
+                    connection.release()
+    
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        if (results.length === 0) {
+                            callback({ status: 404, message: 'User not found' }, null)
+                        } else {
+                            logger.debug(results)
+                            callback(null, {
+                                message: `Found user with ID ${userId}.`,
+                                data: results[0] // Pak het eerste resultaat, aangezien er maar 1 hoord te zijn.
+                            })
+                        }
+                    }
+                }
+            )
+        })
     }
 }
 
