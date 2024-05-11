@@ -6,20 +6,55 @@ const db = require('../dao/mysql-db')
 const userService = {
     create: (user, callback) => {
         logger.info('create user', user)
-        database.add(user, (err, data) => {
+
+        // Deprecated: de 'oude' manier van werken, met de inmemory database
+        // database.add(user, (err, data) => {
+        //     if (err) {
+        //         logger.info(
+        //             'error creating user: ',
+        //             err.message || 'unknown error'
+        //         )
+        //         callback(err, null)
+        //     } else {
+        //         logger.trace(`User created with id ${data.id}.`)
+        //         callback(null, {
+        //             message: `User created with id ${data.id}.`,
+        //             data: data
+        //         })
+        //     }
+        // })
+
+        // Nieuwe manier van werken: met de MySQL database
+        db.getConnection((err, connection) => {
             if (err) {
-                logger.info(
-                    'error creating user: ',
-                    err.message || 'unknown error'
-                )
+                logger.error(err)
                 callback(err, null)
-            } else {
-                logger.trace(`User created with id ${data.id}.`)
-                callback(null, {
-                    message: `User created with id ${data.id}.`,
-                    data: data
-                })
+                return
             }
+
+            connection.query(
+                'INSERT INTO `user` (firstName, lastName, emailAdress, password) VALUES (?, ?, ?, ?)',
+                [user.firstName, user.lastName, user.email, user.password],
+                (error, results, fields) => {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        logger.trace(`User created with id ${results.insertId}.`)
+                        callback(null, {
+                            message: `User created with id ${results.insertId}.`,
+                            data: {
+                                id: results.insertId,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                email: user.email
+                            }
+                        })
+                    }
+                }
+            )
         })
     },
 
