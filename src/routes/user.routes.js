@@ -38,13 +38,13 @@ const validateUserCreate = (req, res, next) => {
 }
 
 // Userroutes
-router.post('/api/user', validateUserCreate, userController.create)
-router.get('/api/user', userController.getAll)
-router.get('/api/user/profile', validateToken, userController.getProfile)
-router.get('/api/user/:userId', userController.getById)
+router.post('/api/user', validateUserCreate, userController.create) // Create user
+router.get('/api/user', userController.getAll) // Get all users
+router.get('/api/user/profile', validateToken, userController.getProfile) // Get profile of currently logged in user
+router.get('/api/user/:userId', userController.getById) // Get user with user id
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', notFound)
-router.delete('/api/user/:userId', notFound)
+router.put('/api/user/:userId', notFound) // Put new user in existing id
+router.delete('/api/user/:userId', notFound) // Delete user by id
 
 module.exports = router
