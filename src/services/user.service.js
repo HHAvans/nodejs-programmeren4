@@ -165,6 +165,50 @@ const userService = {
                 }
             )
         })
+    },
+
+    edit: (userData, callback) => {
+        logger.info('edit user', userData)
+
+        db.getConnection((err, connection) => {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+
+            logger.info('UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ? WHERE id = ?',
+            [userData.firstName, userData.lastName, userData.email, userData.password, userData.id])
+            logger.info([userData.firstName, userData.lastName, userData.email, userData.password, userData.id])
+
+            connection.query(
+                'UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ? WHERE id = ?',
+                [userData.firstName, userData.lastName, userData.email, userData.password, userData.id],
+                (error, results, fields) => {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        if (results.affectedRows === 0) {
+                            callback({ status: 404, message: 'User not found' }, null)
+                        } else {
+                            logger.trace(`User with id ${userData.id} edited successfully.`)
+                            callback(null, {
+                                message: `User with id ${userData.id} edited successfully.`,
+                                data: {
+                                    id: userData.id,
+                                    firstName: userData.firstName,
+                                    lastName: userData.lastName,
+                                    email: userData.email
+                                }
+                            })
+                        }
+                    }
+                }
+            )
+        })
     }
 }
 

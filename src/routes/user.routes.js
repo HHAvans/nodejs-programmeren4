@@ -44,7 +44,7 @@ router.get('/api/user/profile', validateToken, userController.getProfile) // Get
 router.get('/api/user/:userId', userController.getById) // Get user with user id
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', notFound) // Put new user in existing id
+router.put('/api/user/:userId', validateUserCreate, userController.edit) // Put new user in existing id
 router.delete('/api/user/:userId', notFound) // Delete user by id
 
 module.exports = router
