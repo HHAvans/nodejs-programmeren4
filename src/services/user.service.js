@@ -168,7 +168,7 @@ const userService = {
         })
     },
 
-    edit: (userData, callback) => {
+    edit: (userId, userData, callback) => {
         logger.info('edit user', userData)
 
         db.getConnection((err, connection) => {
@@ -179,12 +179,12 @@ const userService = {
             }
 
             logger.info('UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ? WHERE id = ?',
-            [userData.firstName, userData.lastName, userData.email, userData.password, userData.id])
-            logger.info([userData.firstName, userData.lastName, userData.email, userData.password, userData.id])
+            [userData.firstName, userData.lastName, userData.email, userData.password, userId])
+            logger.info([userData.firstName, userData.lastName, userData.email, userData.password, userId])
 
             connection.query(
                 'UPDATE user SET firstName = ?, lastName = ?, emailAdress = ?, password = ? WHERE id = ?',
-                [userData.firstName, userData.lastName, userData.email, userData.password, userData.id],
+                [userData.firstName, userData.lastName, userData.email, userData.password, userId],
                 (error, results, fields) => {
                     connection.release()
 
@@ -195,12 +195,12 @@ const userService = {
                         if (results.affectedRows === 0) {
                             callback({ status: 404, message: 'User not found' }, null)
                         } else {
-                            logger.trace(`User with id ${userData.id} edited successfully.`)
+                            logger.trace(`User with id ${userId} edited successfully.`)
                             callback(null, {
                                 status: 200,
-                                message: `User with id ${userData.id} edited successfully.`,
+                                message: `User with id ${userId} edited successfully.`,
                                 data: {
-                                    id: userData.id,
+                                    id: userId,
                                     firstName: userData.firstName,
                                     lastName: userData.lastName,
                                     email: userData.email

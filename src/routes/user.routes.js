@@ -42,7 +42,7 @@ router.post('/api/user', validateUserCreate, userController.create) // Create us
 router.get('/api/user', userController.getAll) // Get all users
 router.get('/api/user/profile', validateToken, userController.getProfile) // Get profile of currently logged in user
 router.get('/api/user/:userId', userController.getById) // Get user with user id
-router.put('/api/user/', validateUserCreate, userController.edit) // Put new user in existing id
+router.put('/api/user/:userId', validateUserCreate, userController.edit) // Put new user in existing id
 router.delete('/api/user/:userId', userController.delete) // Delete user by id
 
 module.exports = router

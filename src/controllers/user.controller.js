@@ -87,9 +87,10 @@ let userController = {
     },
 
     edit: (req, res, next) => {
+        const userId = req.params.userId
         const user = req.body
         logger.info('edit user', user.firstName, user.lastName)
-        userService.edit(user, (error, success) => {
+        userService.edit(userId, user, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,
