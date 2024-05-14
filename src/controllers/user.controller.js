@@ -36,7 +36,7 @@ let userController = {
             }
             if (success) {
                 res.status(200).json({
-                    status: 200,
+                    status: success.status,
                     message: success.message,
                     data: success.data
                 })
@@ -78,7 +78,7 @@ let userController = {
             }
             if (success) {
                 res.status(200).json({
-                    status: 200,
+                    status: success.status,
                     message: success.message,
                     data: success.data
                 })

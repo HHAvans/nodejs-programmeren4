@@ -44,6 +44,7 @@ const userService = {
                     } else {
                         logger.trace(`User created with id ${results.insertId}.`)
                         callback(null, {
+                            status: 200,
                             message: `User created with id ${results.insertId}.`,
                             data: {
                                 id: results.insertId,
@@ -92,6 +93,7 @@ const userService = {
                     } else {
                         logger.debug(results)
                         callback(null, {
+                            status: 200,
                             message: `Found ${results.length} users.`,
                             data: results
                         })
@@ -123,6 +125,7 @@ const userService = {
                     } else {
                         logger.debug(results)
                         callback(null, {
+                            status: 200,
                             message: `Found ${results.length} user.`,
                             data: results
                         })
