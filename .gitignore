@@ -11,7 +11,7 @@
 # Ignore log files
 *.log
 
-# Ignore git ignore
+# Ignore gitignore file itself
 .gitignore
 
 # Ignore user-specific files
