@@ -11,6 +11,9 @@
 # Ignore log files
 *.log
 
+# Ignore git ignore
+.gitignore
+
 # Ignore user-specific files
 /.env
 /.env.local
