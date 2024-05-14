@@ -24,6 +24,29 @@ const userService = {
         //     }
         // })
 
+        // Check if firstName, lastName, email, and password are provided
+        if (!user.firstName || !user.lastName || !user.email || !user.password) {
+            const error = new Error('Missing required fields');
+            logger.error(error);
+            callback({ status: 400, message: 'Missing required fields' }, null);
+            return;
+        }
+
+        // Validate email format
+        if (!(user.email).includes("@")) {
+            const error = new Error('Invalid email address');
+            logger.error(error);
+            callback({ status: 400, message: 'Invalid email address' }, null);
+            return;
+        }
+
+        // Validate password length
+        if (user.password.length < 6) {
+            const error = new Error('Password must be at least 6 characters long');
+            logger.error(error);
+            return callback({ status: 400, message: 'Password must be at least 6 characters long' }, null);
+        }
+
         // Nieuwe manier van werken: met de MySQL database
         db.getConnection((err, connection) => {
             if (err) {
