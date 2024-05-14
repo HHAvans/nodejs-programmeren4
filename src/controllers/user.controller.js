@@ -1,3 +1,4 @@
+const { query } = require('express')
 const userService = require('../services/user.service')
 const logger = require('../util/logger')
 
@@ -89,6 +90,27 @@ let userController = {
         const user = req.body
         logger.info('edit user', user.firstName, user.lastName)
         userService.edit(user, (error, success) => {
+            if (error) {
+                return next({
+                    status: error.status,
+                    message: error.message,
+                    data: {}
+                })
+            }
+            if (success) {
+                res.status(200).json({
+                    status: success.status,
+                    message: success.message,
+                    data: success.data
+                })
+            }
+        })
+    },
+
+    delete: (req, res, next) => {
+        const userId = req.params.userId
+        logger.info('delete user', userId)
+        userService.delete(userId, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,

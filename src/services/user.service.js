@@ -157,6 +157,7 @@ const userService = {
                         } else {
                             logger.debug(results)
                             callback(null, {
+                                status: 200,
                                 message: `Found user with ID ${userId}.`,
                                 data: results[0] // Pak het eerste resultaat, aangezien er maar 1 hoord te zijn.
                             })
@@ -196,6 +197,7 @@ const userService = {
                         } else {
                             logger.trace(`User with id ${userData.id} edited successfully.`)
                             callback(null, {
+                                status: 200,
                                 message: `User with id ${userData.id} edited successfully.`,
                                 data: {
                                     id: userData.id,
@@ -203,6 +205,42 @@ const userService = {
                                     lastName: userData.lastName,
                                     email: userData.email
                                 }
+                            })
+                        }
+                    }
+                }
+            )
+        })
+    },
+
+    delete: (userId, callback) => {
+        logger.info('delete userId:', userId)
+
+        db.getConnection((err, connection) => {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+
+            connection.query(
+                'DELETE FROM `user` WHERE id = ?',
+                [userId],
+                (error, results, fields) => {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        if (results.affectedRows === 0) {
+                            callback({ status: 404, message: 'User not found' }, null)
+                        } else {
+                            logger.trace(`User with id ${userId} deleted successfully.`)
+                            callback(null, {
+                                status: 200,
+                                message: `User with id ${userId} deleted successfully.`,
+                                data: {}
                             })
                         }
                     }
