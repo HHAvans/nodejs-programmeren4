@@ -16,9 +16,9 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Login
--- CREATE USER `test_user`@`localhost` IDENTIFIED WITH mysql_native_password BY `test_password`
 
-GRANT ALL PRIVILEGES ON `test_db`.* TO `test_user`@`%` IDENTIFIED BY 'test_password';
+CREATE USER 'test_user'@'%' IDENTIFIED BY 'test_password';
+GRANT ALL PRIVILEGES ON *.* TO 'test_user'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
 --
