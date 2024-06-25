@@ -11,19 +11,16 @@ const dbConfig = {
 
     connectionLimit: 10,
     waitForConnections: true,
-    multipleStatements: false, // Adjust based on your needs
-    enableKeepAlive: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    multipleStatements: true,
+    keepAliveInitialDelay: 10000, // 0 by default.
+    enableKeepAlive: true, // false by default.
 }
 
 logger.trace(dbConfig)
 
-let pool
-try {
-    pool = mysql.createPool(dbConfig)
-} catch (err) {
-    logger.error('Error creating MySQL pool:', err.message)
-    process.exit(1) // Exit application or handle error appropriately
-}
+const pool = mysql.createPool(dbConfig)
 
 pool.on('connection', function (connection) {
     logger.trace(
@@ -37,11 +34,6 @@ pool.on('acquire', function (connection) {
 
 pool.on('release', function (connection) {
     logger.trace('Connection %d released', connection.threadId)
-})
-
-pool.on('error', function (err) {
-    logger.error('MySQL Pool Error:', err.message)
-    // Optionally, handle error by destroying the pool and re-creating it
 })
 
 module.exports = pool
