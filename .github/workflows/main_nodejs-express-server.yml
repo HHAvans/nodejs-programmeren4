@@ -16,7 +16,6 @@ env:
   DB_USER: ${{ vars.DB_USER }}
   JWT_SECRET: ${{ vars.JWT_SECRET }}
   LOGLEVEL: ${{ vars.LOGLEVEL }}
-  PORT: 300
 
 jobs:
   build:
