@@ -82,7 +82,6 @@ router.put("", validateToken, async (req, res) => {
             data: {}
         })
     }
-    console.log(req.userId + cookid)
     
     db.getConnection(function (err, connection) {
         const query = `SELECT cookid FROM meal WHERE id = ${id}`;
@@ -173,5 +172,100 @@ router.get("", async (req, res) => {
     })
 });
 
+router.get("/:id", async (req, res) => {
+    console.log(`GET /api/meal/:id`)
+
+    db.getConnection(function (err, connection) {
+        const query = `SELECT * FROM meal WHERE id = ${req.params.id};`
+        console.log(`Executing query on db: `)
+        console.log(query)
+        connection.query(query,
+            function (error, results, fields) {
+                connection.release()
+
+                if (error) {
+                    logger.error(error)
+                    res.status(400).json({
+                        status: 400,
+                        message: error.message,
+                        data: {}
+                    })
+                    return
+                } else if (results.length == 0) {
+                    console.log(`No results found for id`)
+                    res.status(401).json({
+                        status: 401,
+                        message: "Meal could not be found for id " + req.params.id,
+                        data: {}
+                    })
+                } else {
+                    logger.debug(results)
+                    res.status(200).json({
+                        status: 200,
+                        message: `Meal succesfully retrieved.`,
+                        data: results[0]
+                    })
+                }
+            }
+        )
+    })
+});
+
+router.delete("/:id", validateToken, async (req, res) => {
+    console.log(`DELETE /api/meal/:id`)
+    
+    db.getConnection(function (err, connection) {
+        const query = `SELECT cookid FROM meal WHERE id = ${req.params.id}`;
+        console.log(`Executing query on db: `)
+        console.log(query)
+        connection.query(query,
+            function (error, results, fields) {
+                connection.release()
+                
+                //If id doesnt exists
+                if (results.length == 0) {
+                    res.status(401).json({
+                        status: 401,
+                        message: `Mealid ${req.params.id} doesn't exists.`,
+                        data: {}
+                    })
+                } else
+                //Check if cookid matches authorization
+                if (req.userId != results[0].cookid || results[0].cookId == "NULL") {
+                    res.status(401).json({
+                        status: 401,
+                        message: "Userid " + req.userId + " is not authorized to edit this meal.",
+                        data: {}
+                    })
+                } else {
+                    let query2 = `DELETE FROM meal WHERE id = ${req.params.id}`
+
+                    console.log(`Executing query on db: `)
+                    console.log(query2) 
+                    connection.query(query2, function (error, results, fields) {
+                        connection.release()
+                    
+                        if (error) {
+                            logger.error(error)
+                            res.status(400).json({
+                                status: 400,
+                                message: error.message,
+                                data: {}
+                            })
+                            return
+                        } else {
+                            logger.debug(results)
+                            res.status(200).json({
+                                status: 200,
+                                message: `Meal succesfully deleted.`,
+                                data: {}
+                            })
+                        }
+                    })
+                }
+            }
+        )
+    })
+});
 
 module.exports = router
