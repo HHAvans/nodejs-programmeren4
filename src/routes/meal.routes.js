@@ -141,4 +141,37 @@ router.put("", validateToken, async (req, res) => {
     })
 });
 
+router.get("", async (req, res) => {
+    console.log(`GET /api/meal`)
+
+    db.getConnection(function (err, connection) {
+        const query = `SELECT * FROM meal;`
+        console.log(`Executing query on db: `)
+        console.log(query)
+        connection.query(query,
+            function (error, results, fields) {
+                connection.release()
+
+                if (error) {
+                    logger.error(error)
+                    res.status(400).json({
+                        status: 400,
+                        message: error.message,
+                        data: {}
+                    })
+                    return
+                } else {
+                    logger.debug(results)
+                    res.status(200).json({
+                        status: 200,
+                        message: `Retrieved ${results.length} meals.`,
+                        data: results
+                    })
+                }
+            }
+        )
+    })
+});
+
+
 module.exports = router
