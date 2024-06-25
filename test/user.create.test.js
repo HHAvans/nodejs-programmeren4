@@ -10,6 +10,7 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user'
 
 describe('UC201 Registreren als nieuwe user', () => {
+    this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
     /**
      * Voorbeeld van een beforeEach functie.
      * Hiermee kun je code hergebruiken of initialiseren.
@@ -23,6 +24,7 @@ describe('UC201 Registreren als nieuwe user', () => {
      * Hier starten de testcases
      */
     it('TC-201-1 Verplicht veld ontbreekt', (done) => {
+        this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
         chai.request(server)
             .post(endpointToTest)
             .send({
@@ -51,6 +53,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-201-2 Niet-valide email adres', (done) => {
+        this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
         chai.request(server)
             .post(endpointToTest)
             .send({
@@ -76,6 +79,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-201-3 Niet-valide password', (done) => {
+        this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
         chai.request(server)
             .post(endpointToTest)
             .send({
@@ -101,6 +105,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-201-4 Gebruiker bestaat al', (done) => {
+        this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
         // First, let's create a user with the same email address
         chai.request(server)
             .post(endpointToTest)
@@ -132,6 +137,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
+        this.timeout(5000); // Set timeout to 5 seconds to allow azure to work
         chai.request(server)
             .post(endpointToTest)
             .send({
