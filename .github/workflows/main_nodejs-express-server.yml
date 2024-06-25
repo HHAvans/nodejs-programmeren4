@@ -95,9 +95,16 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C0E292A5C33245B6B8D57548D3B4AA1E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_17AD63EC935349C68CE9ECE0FA9085F3 }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'Nodejs-express-server'
           slot-name: 'Production'
           package: .
+
+      - name: Handle deployment errors
+        if: ${{ failure() }}
+        run: |
+          echo "Deployment failed! Check Azure deployment logs."
+          az webapp log tail --name 'Nodejs-express-server' --resource-group 'your-resource-group' # Replace with your actual resource group name
