@@ -16,7 +16,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Login
-CREATE USER 'test_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'test_password'
+CREATE USER `test_user`@`localhost` IDENTIFIED WITH mysql_native_password BY `test_password`
 
 --
 -- Table structure for table `meal`
