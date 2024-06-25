@@ -13,6 +13,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+          MYSQL_ROOT_PASSWORD: root_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd 'mysqladmin ping --silent'
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +37,22 @@ jobs:
         with:
           node-version: '20.x'
 
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in `seq 1 30`; do
+            nc -z localhost 3306 && echo Success && exit 0
+            echo "Waiting for MySQL..."
+            sleep 1
+          done
+          echo "MySQL did not start in time" && exit 1
+
+      - name: Set up database schema
+        run: |
+          mysql -h localhost -u test_user -ptest_password test_db < ./path/to/schema.sql
+
       - name: npm install, build, and test
+        env:
+          DATABASE_URL: mysql://test_user:test_password@localhost:3306/test_db
         run: |
           npm install
           npm run build --if-present
@@ -53,7 +84,7 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-      
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -68,4 +99,3 @@ jobs:
           app-name: 'Nodejs-express-server'
           slot-name: 'Production'
           package: .
-          
