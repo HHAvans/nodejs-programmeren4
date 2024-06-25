@@ -13,49 +13,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: test_password
-          MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password  # Ensure this line is added
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd "mysqladmin ping --silent --wait=30"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
-
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in `seq 1 30`; do
-            if mysqladmin ping -h 127.0.0.1 -u test_user -ptest_password --silent; then
-              echo "MySQL is up and running"
-              break
-            fi
-            echo "Waiting for MySQL..."
-            sleep 2
-          done
-
-      - name: Set up database schema
-        run: |
-          mysql -h 127.0.0.1 -u test_user -ptest_password test_db < ./schema.sql
+          node-version: '20.x'
 
       - name: npm install, build, and test
-        env:
-          DATABASE_URL: mysql://test_user:test_password@127.0.0.1:3306/test_db
         run: |
           npm install
           npm run build --if-present
@@ -65,7 +31,7 @@ jobs:
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: node-app
           path: release.zip
@@ -77,17 +43,17 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: node-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+      
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -95,16 +61,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C0E292A5C33245B6B8D57548D3B4AA1E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_17AD63EC935349C68CE9ECE0FA9085F3 }}
 
-      - name: Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'Nodejs-express-server'
           slot-name: 'Production'
           package: .
-
-      - name: Handle deployment errors
-        if: ${{ failure() }}
-        run: |
-          echo "Deployment failed! Check Azure deployment logs."
-          az webapp log tail --name 'Nodejs-express-server' --resource-group 'your-resource-group' # Replace with your actual resource group name
+          
