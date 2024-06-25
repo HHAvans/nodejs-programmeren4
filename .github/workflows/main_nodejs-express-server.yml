@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - Nodejs-express-server
 
 on:
@@ -14,14 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '14.x'
+
+      # Remove the "Wait for MySQL to be ready" step if not needed for deployment
+
+      - name: Set up database schema
+        run: |
+          mysql -h <your-mysql-hostname> -u <your-mysql-username> -p"${{ secrets.DB_PASSWORD }}" test_db < ./schema.sql
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: npm install, build, and test
+        env:
+          DATABASE_URL: mysql://<your-mysql-username>:${{ secrets.DB_PASSWORD }}@<your-mysql-hostname>:3306/test_db
         run: |
           npm install
           npm run build --if-present
@@ -31,7 +39,7 @@ jobs:
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: node-app
           path: release.zip
@@ -43,17 +51,17 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: node-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-      
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -61,11 +69,16 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C0E292A5C33245B6B8D57548D3B4AA1E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_17AD63EC935349C68CE9ECE0FA9085F3 }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'Nodejs-express-server'
           slot-name: 'Production'
           package: .
-          
+
+      - name: Handle deployment errors
+        if: ${{ failure() }}
+        run: |
+          echo "Deployment failed! Check Azure deployment logs."
+          az webapp log tail --name 'Nodejs-express-server' --resource-group 'your-resource-group' # Replace with your actual resource group name
