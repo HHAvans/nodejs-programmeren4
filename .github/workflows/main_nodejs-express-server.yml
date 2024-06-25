@@ -9,12 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  DB_HOST: 127.0.0.1
-  DB_PORT: 3306
-  DB_DATABASE: share-a-meal-testdb
-  DB_USER: root
-  DB_PASSWORD: root
 jobs:
   build:
     runs-on: ubuntu-latest
