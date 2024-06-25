@@ -18,7 +18,7 @@
 -- Login
 -- CREATE USER `test_user`@`localhost` IDENTIFIED WITH mysql_native_password BY `test_password`
 
-GRANT ALL PRIVILEGES ON test_db.* TO 'test_user'@'%' IDENTIFIED BY 'test_password';
+GRANT ALL PRIVILEGES ON `test_db`.* TO `test_user`@`%` IDENTIFIED BY 'test_password';
 FLUSH PRIVILEGES;
 
 --
