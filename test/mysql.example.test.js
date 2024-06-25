@@ -39,7 +39,8 @@ const INSERT_MEALS =
     "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);"
 
-describe('Example MySql testcase', () => {
+describe('Example MySql testcase', function() {
+    this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
     //
     // informatie over before, after, beforeEach, afterEach:
     // https://mochajs.org/#hooks
@@ -52,7 +53,8 @@ describe('Example MySql testcase', () => {
         done()
     })
 
-    describe('UC201 Reading a user should succeed', () => {
+    describe('UC201 Reading a user should succeed', function() {
+        this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
         //
         beforeEach((done) => {
             logger.debug('beforeEach called')
@@ -77,7 +79,8 @@ describe('Example MySql testcase', () => {
             })
         })
 
-        it('TC-xyz should return valid user', (done) => {
+        it('TC-xyz should return valid user', function(done) {
+            this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
             chai.request(server)
                 .get('/api/user')
                 .end((err, res) => {
@@ -108,7 +111,8 @@ describe('Example MySql testcase', () => {
                 })
         })
 
-        it('TC-xyz should return valid user profile', (done) => {
+        it('TC-xyz should return valid user profile', function(done) {
+            this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
             const token = jwt.sign({ userId: 1 }, jwtSecretKey)
             chai.request(server)
                 .get('/api/user/profile')
