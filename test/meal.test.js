@@ -35,8 +35,8 @@ before(async () => {
       const loginResponse = await chai.request(server)
         .post('/api/auth/login')
         .send({
-            "emailAdress": "name@server.nl",
-            "password": "secret"
+            "emailAdress": "u.pdated@example.com",
+            "password": "password"
         })
   
       token = "Bearer " + loginResponse.body.data.token; // Store the authentication token
