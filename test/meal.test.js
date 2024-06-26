@@ -15,6 +15,20 @@ let token;
 
 //login
 before(async () => {
+
+    //Add required tables to db
+    db.getConnection((err, connection) => { //INSERT INTO `user` (`id`,`firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', street, city), (2, 'Existing', 'User', 'e.xistinguser@exmaple.com', 'password', street, city), (3, 'first', 'last', 'name@server.nl', 'secret', street, city), (4, 'Voornaam', 'Achternaam', 'v.aaaa@server.nl', 'secretpassword', street, city); INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES (1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1), (2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1), (100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1); 
+        connection.query("INSERT INTO `user` (`id`,`firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', street, city), (2, 'Existing', 'User', 'e.xistinguser@exmaple.com', 'password', street, city), (3, 'first', 'last', 'name@server.nl', 'secret', street, city), (4, 'Voornaam', 'Achternaam', 'v.aaaa@server.nl', 'secretpassword', street, city); INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES (1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1), (2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1), (100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1); ",
+            (error, results, fields) => {
+            connection.release();
+            if (err) {
+                console.log('inserteed error')
+                console.log(err)
+            }
+            console.log("Inserted")
+        })
+    })
+
     try {
       const loginResponse = await chai.request(server)
         .post('/api/auth/login')
