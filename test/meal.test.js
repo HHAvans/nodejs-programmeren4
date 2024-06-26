@@ -39,10 +39,10 @@ before(async () => {
             "password": "password"
         })
         .end((err, res) => {
-            console.log(res.body)
+            console.log()
             done();
         });
-  
+      console.log(loginResponse.body)
       token = "Bearer " + loginResponse.body.data.token; // Store the authentication token
   
       console.log('Auth Token:', token);
