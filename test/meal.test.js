@@ -61,7 +61,8 @@ describe('UC-301 Adding a Meal', () => {
                 // No fields
             })
             .end((err, res) => {
-                console.log('Results adding meal: ' + token, + "\n" + res.body)
+                console.log('Results adding meal: ' + token, + "\n")
+                console.log(res.body)
                 chai.expect(res).to.have.status(400);
                 chai.expect(res.body).to.be.a('object');
                 chai.expect(res.body).to.have.property('status').equals(400);
