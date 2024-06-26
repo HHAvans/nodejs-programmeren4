@@ -210,7 +210,7 @@ router.get("", async (req, res) => {
                     isActive: meal.cookIsActive,
                     email: meal.cookEmail,
                     phoneNumber: meal.cookPhoneNumber,
-                    roles: meal.cookRoles.split(','), // Convert roles string to array
+                    roles: meal.cookRoles ? meal.cookRoles.split(',') : null, // Check if meal.cookRoles is not null before splitting
                     street: meal.cookStreet,
                     city: meal.cookCity
                     // Add other user fields as needed
