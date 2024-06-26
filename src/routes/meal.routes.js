@@ -58,23 +58,27 @@ router.post("", validateToken, async (req, res) => {
     })
 });
 
-router.put("", validateToken, async (req, res) => {
+router.put("/:id", validateToken, async (req, res) => {
     console.log(`PUT /api/meal body:`)
     console.log(req.body)
 
     // Validate fields
     const {
-       id, isactive, isvega, isvegan, istotakehome,
        datetime, maxamountofparticipants, price,
-       imageurl, name, description, allergenes  
+       imageurl, name, description
     } = req.body
 
-    const cookid = req.body.cookid;
+    const id = req.params.id
+    const cookid = req.body.cookid || "NULL";
+    const isactive = req.body.isactive || 0;
+    const isvega = req.body.isvega || 0;
+    const isvegan = req.body.isvegan || 0;
+    const istotakehome = req.body.istotakehome || 0;
+    const allergenes = req.body.allergenes || "";
 
     if (
-        !id, !isactive || !isvega || !isvegan || !istotakehome ||
-        !datetime || !maxamountofparticipants || !price ||
-        !imageurl || !name || !description || !allergenes
+        !id ||  !datetime || !maxamountofparticipants || !price ||
+        !imageurl || !name || !description 
     ) {
         res.status(400).json({
             status: 400,
@@ -92,51 +96,53 @@ router.put("", validateToken, async (req, res) => {
                 connection.release()
                 
                 console.log(req.userId + " " + results[0].cookid)
+                console.log(results[0].cookid == "null")
                 //Check if cookid matches authorization
-                if (req.userId != results[0].cookid || results[0].cookId == "NULL") {
+                if (req.userId !== results[0].cookid && results[0].cookid !== null) {
                     res.status(401).json({
                         status: 401,
                         message: "Userid " + req.userId + " is not authorized to edit this meal.",
                         data: {}
                     })
+                } else {
+                    let query2 = `UPDATE meal SET 
+                    id = ${id}, isActive = ${isactive}, isVega = ${isvega}, isVegan = ${isvegan},
+                    isToTakeHome = ${istotakehome}, dateTime = '${datetime}', maxAmountOfParticipants = ${maxamountofparticipants},
+                    price = ${price}, imageUrl = '${imageurl}', updateDate = NOW(), name = "${name}", description = "${description}", allergenes = '${allergenes}'`;
+                    
+                    // Add new cookid if specified
+                    if (cookid) {
+                        query2 = query2 + `, cookid = ${cookid}`
+                    }
+            
+                    // Add where clause
+                    query2 = query2 + ` WHERE id = ${id};`
+            
+                    console.log(`Executing query on db: `)
+                    console.log(query2) 
+                    connection.query(query2, function (error, results, fields) {
+                        connection.release()
+                    
+                        if (error) {
+                            logger.error(error)
+                            res.status(400).json({
+                                status: 400,
+                                message: error.message,
+                                data: {}
+                            })
+                            return
+                        } else {
+                            logger.debug(results)
+                            res.status(200).json({
+                                status: 200,
+                                message: `Meal succesfully edited.`,
+                                data: req.body
+                            })
+                        }
+                    })
                 }
             }
         )
-        let query2 = `UPDATE meal SET 
-        id = ${id}, isActive = ${isactive}, isVega = ${isvega}, isVegan = ${isvegan},
-        isToTakeHome = ${istotakehome}, dateTime = '${datetime}', maxAmountOfParticipants = ${maxamountofparticipants},
-        price = ${price}, imageUrl = '${imageurl}', updateDate = NOW(), name = "${name}", description = "${description}", allergenes = '${allergenes}'`;
-        
-        // Add new cookid if specified
-        if (cookid) {
-            query2 = query2 + `, cookid = ${cookid}`
-        }
-
-        // Add where clause
-        query2 = query2 + ` WHERE id = ${id};`
-
-        console.log(`Executing query on db: `)
-        console.log(query2) 
-        connection.query(query2, function (error, results, fields) {
-            connection.release()
-        
-            if (error) {
-                logger.error(error)
-                res.status(400).json({
-                    status: 400,
-                    message: error.message,
-                    data: {}
-                })
-                return
-            } else {
-                logger.debug(results)
-                res.status(200).json({
-                    status: 200,
-                    message: `Meal succesfully edited.`,
-                    data: req.body
-                })
-            }
-        })
     })
 });
 
@@ -231,7 +237,7 @@ router.delete("/:id", validateToken, async (req, res) => {
                     })
                 } else
                 //Check if cookid matches authorization
-                if (req.userId != results[0].cookid || results[0].cookId == "NULL") {
+                if (req.userId != results[0].cookid && results[0].cookId !== null) {
                     res.status(401).json({
                         status: 401,
                         message: "Userid " + req.userId + " is not authorized to edit this meal.",
