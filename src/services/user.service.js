@@ -33,8 +33,8 @@ const userService = {
             }
 
             connection.query(
-                'INSERT INTO `user` (firstName, lastName, emailAdress, password) VALUES (?, ?, ?, ?)',
-                [user.firstName, user.lastName, user.email, user.password],
+                'INSERT INTO `user` (firstName, lastName, emailAdress, password, street, city) VALUES (?, ?, ?, ?, ?, ?)',
+                [user.firstName, user.lastName, user.email, user.password, user.street || "", user.city || ""],
                 (error, results, fields) => {
                     connection.release()
 
