@@ -16,59 +16,76 @@ const db = require('../src/dao/mysql-db')
 let token;
 
 //login
-before(async () => {
+before((done) => {
+    // Add required tables to db
+    db.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error connecting to database:', err);
+            return done(err); // Return and pass error to Mocha
+        }
 
-    //Add required tables to db
-    db.getConnection((err, connection) => { //INSERT INTO `user` (`id`,`firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', street, city), (2, 'Existing', 'User', 'e.xistinguser@exmaple.com', 'password', street, city), (3, 'first', 'last', 'name@server.nl', 'secret', street, city), (4, 'Voornaam', 'Achternaam', 'v.aaaa@server.nl', 'secretpassword', street, city); INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES (1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1), (2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1), (100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1); 
-        connection.query("INSERT INTO `user` (`id`,`firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', street, city), (2, 'Existing', 'User', 'e.xistinguser@exmaple.com', 'password', street, city), (3, 'first', 'last', 'name@server.nl', 'secret', street, city), (4, 'Voornaam', 'Achternaam', 'v.aaaa@server.nl', 'secretpassword', street, city); INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES (1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1), (2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1), (100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1); ",
-            (error, results, fields) => {
-            connection.release();
-            if (err) {
-                console.log('inserteed error')
-                console.log(err)
-            }
-            console.log("Inserted")
-        })
-    })
+        // Query to insert initial data into `user` and `meal` tables
+        const initialDataQuery = `
+            INSERT INTO user (id, firstName, lastName, emailAdress, password, street, city)
+            VALUES
+            (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', 'street', 'city'),
+            (2, 'Existing', 'User', 'e.xistinguser@exmaple.com', 'password', 'street', 'city'),
+            (3, 'first', 'last', 'name@server.nl', 'secret', 'street', 'city'),
+            (4, 'Voornaam', 'Achternaam', 'v.aaaa@server.nl', 'secretpassword', 'street', 'city');
 
-    try {
-      const loginResponse = await chai.request(server)
-        .post('/api/auth/login')
-        .send({
-            "emailAdress": "u.pdated@example.com",
-            "password": "password"
-        })
-        .end((err, res) => {
-            if (err) {
-                console.error('Error during login:', err);
-                return done(err);
-            }
+            INSERT INTO meal (id, name, description, imageUrl, dateTime, maxAmountOfParticipants, price, cookId)
+            VALUES
+            (1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1),
+            (2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1),
+            (100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1);
+        `;
 
-            
-            if (res.status !== 200) {
-                console.error('Login failed with status:', res.status);
-                return done(new Error('Login failed'));
+        connection.query(initialDataQuery, (error, results, fields) => {
+            connection.release(); // Release the connection
+
+            if (error) {
+                console.error('Error inserting initial data:', error);
+                return done(error); // Return and pass error to Mocha
             }
 
-            
-            const tokenData = res.body.data;
-            if (!tokenData || !tokenData.token) {
-                console.error('Token not found in login response');
-                return done(new Error('Token not found'));
-            }
+            console.log('Inserted initial data successfully');
 
-            // Assign the token for later use
-            token = `Bearer ${tokenData.token}`;
+            // Now perform the login request
+            chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    emailAdress: 'u.pdated@example.com',
+                    password: 'password'
+                })
+                .end((err, res) => {
+                    if (err) {
+                        console.error('Error during login:', err);
+                        return done(err); // Return and pass error to Mocha
+                    }
 
-            console.log('Auth Token:', token);
+                    // Check response status
+                    if (res.status !== 200) {
+                        console.error('Login failed with status:', res.status);
+                        return done(new Error('Login failed'));
+                    }
 
-            done();
-        })
-    } catch (error) {
-      console.error('Error during setup:', error);
-      throw error;
-    }
-  });
+                    // Assuming your response body structure is { data: { token: 'your_token_value' } }
+                    const tokenData = res.body.data;
+                    if (!tokenData || !tokenData.token) {
+                        console.error('Token not found in login response');
+                        return done(new Error('Token not found'));
+                    }
+
+                    // Assign the token for later use
+                    token = `Bearer ${tokenData.token}`;
+
+                    console.log('Auth Token:', token); // Log the token for debugging
+
+                    done(); // Call done to indicate that before hook is complete
+                });
+        });
+    });
+});
   
 
 describe('UC-301 Adding a Meal', () => {
