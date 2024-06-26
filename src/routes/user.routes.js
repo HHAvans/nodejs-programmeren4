@@ -37,12 +37,24 @@ const validateUserCreate = (req, res, next) => {
     }
 }
 
+const validateAuthorization = (req, res, next) => {
+    //Check if cookid matches authorization
+    if (req.params.id != req.userId) {
+        next({
+            status: 401,
+            message: "Userid " + req.userId + " is not authorized to edit this user.",
+            data: {}
+        })
+    }
+    next()
+}
+
 // Userroutes
 router.post('/api/user', validateUserCreate, userController.create) // Create user
 router.get('/api/user', userController.getAll) // Get all users
 router.get('/api/user/profile', validateToken, userController.getProfile) // Get profile of currently logged in user
 router.get('/api/user/:userId', userController.getById) // Get user with user id
-router.put('/api/user/:userId', validateUserCreate, userController.edit) // Put new user in existing id
-router.delete('/api/user/:userId', userController.delete) // Delete user by id
+router.put('/api/user/:id', validateToken, validateAuthorization, validateUserCreate, userController.edit) // Put new user in existing id
+router.delete('/api/user/:id', validateToken, validateAuthorization, userController.delete) // Delete user by id
 
 module.exports = router

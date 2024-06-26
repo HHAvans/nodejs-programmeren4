@@ -87,7 +87,7 @@ let userController = {
     },
 
     edit: (req, res, next) => {
-        const userId = req.params.userId
+        const userId = req.params.id
         const user = req.body
         logger.info('edit user', user.firstName, user.lastName)
         userService.edit(userId, user, (error, success) => {
@@ -109,7 +109,7 @@ let userController = {
     },
 
     delete: (req, res, next) => {
-        const userId = req.params.userId
+        const userId = req.params.id
         logger.info('delete user', userId)
         userService.delete(userId, (error, success) => {
             if (error) {
