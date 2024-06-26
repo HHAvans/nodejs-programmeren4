@@ -1,5 +1,6 @@
-process.env.DB_DATABASE = 'share_a_meal'
-process.env.LOGLEVEL = 'trace'
+if (process.env.DB_DATABASE != 'share_a_meal') {
+    process.env.DB_DATABASE = 'share-a-meal-testdb'
+}
 
 const chai = require('chai')
 const chaiHttp = require('chai-http')
