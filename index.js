@@ -16,8 +16,8 @@ app.get('/api/info', (req, res) => {
     console.log('GET /api/info')
     const info = {
         name: 'Express nodejs server programmeren 4',
-        version: '1.0.0',
-        description: 'Dit is de nodejs express server voor mijn programmeren 4 toets.'
+        version: '2.0.0',
+        description: 'Dit is de nodejs express server voor mijn programmeren 4 toets herkansing.'
     }
     res.json(info)
 })
