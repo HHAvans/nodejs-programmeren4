@@ -32,21 +32,38 @@ before(async () => {
     })
 
     try {
-      const loginResponse = chai.request(server)
+      const loginResponse = await chai.request(server)
         .post('/api/auth/login')
         .send({
             "emailAdress": "u.pdated@example.com",
             "password": "password"
         })
         .end((err, res) => {
-            console.log()
+            if (err) {
+                console.error('Error during login:', err);
+                return done(err);
+            }
+
+            
+            if (res.status !== 200) {
+                console.error('Login failed with status:', res.status);
+                return done(new Error('Login failed'));
+            }
+
+            
+            const tokenData = res.body.data;
+            if (!tokenData || !tokenData.token) {
+                console.error('Token not found in login response');
+                return done(new Error('Token not found'));
+            }
+
+            // Assign the token for later use
+            token = `Bearer ${tokenData.token}`;
+
+            console.log('Auth Token:', token);
+
             done();
-        });
-      console.log(loginResponse.body)
-      token = "Bearer " + loginResponse.body.data.token; // Store the authentication token
-  
-      console.log('Auth Token:', token);
-  
+        })
     } catch (error) {
       console.error('Error during setup:', error);
       throw error;
