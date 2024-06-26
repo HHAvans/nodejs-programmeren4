@@ -76,7 +76,7 @@ jobs:
 
     deploy:
         runs-on: ubuntu-latest
-        needs: [test]
+        needs: [integrationtests]
         environment:
             name: 'Production'
             url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
