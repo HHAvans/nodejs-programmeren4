@@ -38,6 +38,10 @@ before(async () => {
             "emailAdress": "u.pdated@example.com",
             "password": "password"
         })
+        .end((err, res) => {
+            console.log(res.body)
+            done();
+        });
   
       token = "Bearer " + loginResponse.body.data.token; // Store the authentication token
   
