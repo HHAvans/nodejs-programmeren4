@@ -32,7 +32,7 @@ before(async () => {
     })
 
     try {
-      const loginResponse = await chai.request(server)
+      const loginResponse = chai.request(server)
         .post('/api/auth/login')
         .send({
             "emailAdress": "u.pdated@example.com",
