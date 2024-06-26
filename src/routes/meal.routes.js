@@ -155,36 +155,88 @@ router.put("/:id", validateToken, async (req, res) => {
 });
 
 router.get("", async (req, res) => {
-    console.log(`GET /api/meal`)
+    console.log(`GET /api/meal`);
+
+    const query = `
+        SELECT meal.*, 
+               user.id AS userId,
+               user.firstName AS cookFirstName,
+               user.lastName AS cookLastName,
+               user.isActive AS cookIsActive,
+               user.emailAdress AS cookEmail,
+               user.phoneNumber AS cookPhoneNumber,
+               user.roles AS cookRoles,
+               user.street AS cookStreet,
+               user.city AS cookCity
+        FROM meal
+        LEFT JOIN user ON meal.cookId = user.id;
+    `;
 
     db.getConnection(function (err, connection) {
-        const query = `SELECT * FROM meal;`
-        console.log(`Executing query on db: `)
-        console.log(query)
-        connection.query(query,
-            function (error, results, fields) {
-                connection.release()
+        if (err) {
+            console.error('Error connecting to database:', err);
+            res.status(500).json({
+                status: 500,
+                message: 'Database connection error',
+                data: {}
+            });
+            return;
+        }
 
-                if (error) {
-                    logger.error(error)
-                    res.status(400).json({
-                        status: 400,
-                        message: error.message,
-                        data: {}
-                    })
-                    return
-                } else {
-                    logger.debug(results)
-                    res.status(200).json({
-                        status: 200,
-                        message: `Retrieved ${results.length} meals.`,
-                        data: results
-                    })
-                }
+        console.log(`Executing query on db: `);
+        console.log(query);
+
+        connection.query(query, function (error, results, fields) {
+            connection.release();
+
+            if (error) {
+                console.error('Error executing query:', error);
+                res.status(500).json({
+                    status: 500,
+                    message: 'Database query error',
+                    data: {}
+                });
+                return;
             }
-        )
-    })
+
+            console.log('Retrieved meals:', results.length);
+
+            // Transforming results to include cook object with all user details
+            const transformedResults = results.map(meal => {
+                const cook = {
+                    id: meal.userId,
+                    firstName: meal.cookFirstName,
+                    lastName: meal.cookLastName,
+                    isActive: meal.cookIsActive,
+                    email: meal.cookEmail,
+                    phoneNumber: meal.cookPhoneNumber,
+                    roles: meal.cookRoles.split(','), // Convert roles string to array
+                    street: meal.cookStreet,
+                    city: meal.cookCity
+                    // Add other user fields as needed
+                };
+                delete meal.userId; // Remove userId from meal object
+                delete meal.cookFirstName; // Remove cookFirstName from meal object
+                delete meal.cookLastName; // Remove cookLastName from meal object
+                delete meal.cookIsActive; // Remove cookIsActive from meal object
+                delete meal.cookEmail; // Remove cookEmail from meal object
+                delete meal.cookPhoneNumber; // Remove cookPhoneNumber from meal object
+                delete meal.cookRoles; // Remove cookRoles from meal object
+                delete meal.cookStreet; // Remove cookStreet from meal object
+                delete meal.cookCity; // Remove cookCity from meal object
+                meal.cook = cook; // Add cook object to meal
+                return meal;
+            });
+
+            res.status(200).json({
+                status: 200,
+                message: `Retrieved ${transformedResults.length} meals.`,
+                data: transformedResults
+            });
+        });
+    });
 });
+
 
 router.get("/:id", async (req, res) => {
     console.log(`GET /api/meal/:id`)
