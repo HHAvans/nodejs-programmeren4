@@ -25,7 +25,7 @@ before((done) => {
         }
 
         // Query to insert initial data into `user` and `meal` tables
-        const initialDataQuery = `
+        const initialDataQuery = `DELETE FROM meal;DELETE FROM user;
             INSERT INTO user (id, firstName, lastName, emailAdress, password, street, city)
             VALUES
             (1, 'Updated', 'LastName', 'u.pdated@example.com', 'password', 'street', 'city'),
