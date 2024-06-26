@@ -28,7 +28,7 @@ const CLEAR_DB = CLEAR_MEAL_TABLE + CLEAR_PARTICIPANTS_TABLE + CLEAR_USERS_TABLE
  */
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "secret", "street", "city");'
+    '(1, "first", "last", "name@server.nl", "secret", "street", "city"), (1111, "first", "last", "another@server.nl", "secret", "street", "city");'
 
 /**
  * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
@@ -36,11 +36,10 @@ const INSERT_USER =
  */
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
-    "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
+    "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1),(100, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);"
 
 describe('Example MySql testcase', function() {
-    this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
     //
     // informatie over before, after, beforeEach, afterEach:
     // https://mochajs.org/#hooks
@@ -54,7 +53,6 @@ describe('Example MySql testcase', function() {
     })
 
     describe('UC201 Reading a user should succeed', function() {
-        this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
         //
         beforeEach((done) => {
             logger.debug('beforeEach called')
@@ -64,10 +62,11 @@ describe('Example MySql testcase', function() {
 
                 // Use the connection
                 connection.query(
-                    CLEAR_DB + INSERT_USER,
+                    CLEAR_DB + INSERT_USER + INSERT_MEALS,
                     function (error, results, fields) {
                         // When done with the connection, release it.
                         connection.release()
+                        console.log("Cleared")
 
                         // Handle error after the release.
                         if (error) throw error
@@ -80,7 +79,6 @@ describe('Example MySql testcase', function() {
         })
 
         it('TC-xyz should return valid user', function(done) {
-            this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
             chai.request(server)
                 .get('/api/user')
                 .end((err, res) => {
@@ -95,7 +93,7 @@ describe('Example MySql testcase', function() {
 
                     const data = res.body.data
 
-                    data.should.be.an('array').that.has.lengthOf(1)
+                    data.should.be.an('array').that.has.lengthOf(2)
                     data[0].should.be.an('object').that.has.all.keys(
                         'id',
                         'firstName',
@@ -112,7 +110,6 @@ describe('Example MySql testcase', function() {
         })
 
         it('TC-xyz should return valid user profile', function(done) {
-            this.timeout(50000); // Set timeout to 50 seconds to allow azure to work
             const token = jwt.sign({ userId: 1 }, jwtSecretKey)
             chai.request(server)
                 .get('/api/user/profile')
