@@ -85,7 +85,7 @@ describe('UC201 Registreren als nieuwe user', function() {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                email: 'v.a@server.nl',
+                email: 'v.aaaaa@server.nl',
                 password: 'short'
             })
             .end((err, res) => {
@@ -95,7 +95,7 @@ describe('UC201 Registreren als nieuwe user', function() {
                 chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
-                    .equals('Password must be at least 6 characters long')
+                    .equals('Password must be at least 8 characters long')
                 chai.expect(res.body)
                     .to.have.property('data')
                     .that.is.a('object').that.is.empty
@@ -112,7 +112,7 @@ describe('UC201 Registreren als nieuwe user', function() {
             .send({
                 firstName: 'Existing',
                 lastName: 'User',
-                email: 'existinguser@example.com',
+                email: 'e.xistinguser@example.com',
                 password: 'password'
             })
             .end(() => {
@@ -122,13 +122,13 @@ describe('UC201 Registreren als nieuwe user', function() {
                     .send({
                         firstName: 'New',
                         lastName: 'User',
-                        email: 'existinguser@example.com',
+                        email: 'e.xistinguser@example.com',
                         password: 'newpassword'
                     })
                     .end((err, res) => {
                         chai.expect(res.body).to.be.a('object')
                         chai.expect(res.body).to.have.property('status').equals(500)
-                        chai.expect(res.body).to.have.property('message').include("Duplicate entry 'existinguser@example.com'")
+                        chai.expect(res.body).to.have.property('message').include("Duplicate entry 'e.xistinguser@example.com'")
                         chai.expect(res.body).to.have.property('data').that.is.a('object').that.is.empty
     
                         done()
@@ -143,8 +143,8 @@ describe('UC201 Registreren als nieuwe user', function() {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                email: 'v.a@server.nl',
-                password: 'secret'
+                email: 'v.aaaa@server.nl',
+                password: 'secretpassword'
             })
             .end((err, res) => {
                 res.should.have.status(200)
