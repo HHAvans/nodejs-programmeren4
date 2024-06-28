@@ -24,8 +24,8 @@ app.get('/api/info', (req, res) => {
 
 // Hier komen alle routes
 app.use(userRoutes)
+app.use(mealRoutes)
 app.use('/api/auth', authRoutes)
-app.use('/api/meal', mealRoutes)
 
 // Route error handler
 app.use((req, res, next) => {
